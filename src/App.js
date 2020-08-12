@@ -1,26 +1,39 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useMemo} from 'react'
+import './App.css'
+import {AppContext} from './context/AppContext'
+import {useAuth} from './hooks/auth.hook'
+import MainLayout from './layouts/MainLayout/MainLayout'
+import RouteSwitch from './routes/RouteSwitch/RouteSwitch'
 
 function App() {
+  const auth = useAuth()
+
+  const routeSwitch = useMemo( () => {
+    return (
+      <RouteSwitch
+        isAuthentication={auth.isAuthentication}
+      />
+    )
+  }, [auth.isAuthentication] )
+
+  if ( auth.fistRender ) {
+    return (
+      <></>
+    )
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <AppContext.Provider value={
+      {
+        auth: {...auth},
+        config: {...AppContext._currentValue.config}
+      }
+    }>
+      <MainLayout
+        page={routeSwitch}
+      />
+    </AppContext.Provider>
+  )
 }
 
-export default App;
+export default App
